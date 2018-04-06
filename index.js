@@ -1,32 +1,27 @@
 const path = require('path');
 const express = require('express');
-// var config = require('./config.json');
 const app = express();
-const io = require('socket.io')(http);
+const io = require('socket.io')(require('https').Server(app));
 const assert = require('assert');
-const mongo = require('mongodb').MongoClient;
-const mongoUrl = process.env.MONGODB_URL;
-var question, answer;
+const mongoClient = require('mongodb').MongoClient;
+const mongoUri = process.env.MONGODB_URI;
+var cards;
 
-MongoClient.connect(mongoUrl, function(err, db) {
-  assert.equal(null, err);
-  console.log("Connected to mongodb.");
-
-  db.mycoll.aggregate({$sample: { size: 1 }}).toArray(function(err, results){
-    console.log(results);
-    db.close();
-    console.log("Connection to database is closed.");
-  });
-  
-  // db.collection('countries').find({},{"sort": [["area",-1]]}).limit(20).toArray(function(err, results){
-  //   console.log("Country One " +JSON.stringify(results[0]));
-  //   console.log("Name of Country Four " +results[3].name+ " and size: " +results[3].area);
-  //
-  //   db.close();
-  //   console.log("Connection to database is closed.");
-  // });
-
-}) //connect()
+//connect to db and set cards
+mongoClient.connect(mongoUri, function (err, client) {
+  if(err){
+    console.log('Error establishing database connection: ', err);
+  } else{
+    var db = client.db('');
+    db.collection('cards').find({}).toArray(function(err, result){
+      if(err){
+        console.log('Error finding cards: ', err);
+      } else{
+        cards = result;
+      }
+    });
+  }
+});
 
 // If an incoming request uses
 // a protocol other than HTTPS,
@@ -62,7 +57,3 @@ app.get('/*', function (req, res) {
 // Heroku port
 app.listen(process.env.PORT || 8080);
 console.log('Server at localhost:8080');
-// config.PARSE_ID = process.env.PARSE_ID;
-// config.PARSE_URL = process.env.PARSE_URL;
-// console.log(config.appId);
-// console.log(process.env.ENV_VARIABLE);
