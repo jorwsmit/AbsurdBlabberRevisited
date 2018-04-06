@@ -2,17 +2,14 @@
   "name": "absurd-blabber-revisited",
   "version": "0.0.0",
   "license": "MIT",
-  "engines": {
-    "node": "8.9.1"
-  },
   "scripts": {
-
     "ng": "ng",
+    "build": "ng build",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "start": "node index.js",
     "test": "ng test",
-    "postinstall": "ng build --prod"
+    "postinstall": "ng build --aot -prod"
   },
   "private": true,
   "dependencies": {
@@ -50,5 +47,9 @@
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
+  },
+  "engines": {
+    "node": "8.9.1",
+    "npm": "5.5.1"
   }
 }
