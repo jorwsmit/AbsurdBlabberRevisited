@@ -9,7 +9,7 @@
     "e2e": "ng e2e",
     "start": "node index.js",
     "test": "ng test",
-    "postinstall": "ng build --prod",
+    "postinstall": "ng build --prod"
   },
   "private": true,
   "dependencies": {
