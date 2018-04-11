@@ -23,6 +23,20 @@ mongoClient.connect(mongoUri, function (err, client) {
   }
 });
 
+io.on('connection', (socket) => {
+  console.log('user connected');
+
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+
+  socket.on('login', function(username, callback){
+    console.log(username + ' has connected.');
+    callback(true);
+  });
+});
+
+
 // If an incoming request uses
 // a protocol other than HTTPS,
 // redirect that request to the
