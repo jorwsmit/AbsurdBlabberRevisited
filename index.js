@@ -1,23 +1,40 @@
 const path = require('path');
 const express = require('express');
 const app = express();
-const io = require('socket.io')(require('https').Server(app));
-const assert = require('assert');
+
+var users = {};
+
+var card = '';
+var cards = [];
+
+// Start the app by listening on the default
+// Heroku port
+const server = app.listen(process.env.PORT || 8080);
+console.log('Server at localhost:8080');
+
+// used for heroku deployment
+// const io = require('socket.io')(require('https').Server(app));
+
+// used for local deployment
+const io = require('socket.io').listen(server);
+
 const mongoClient = require('mongodb').MongoClient;
 const mongoUri = process.env.MONGODB_URI;
-var cards;
-
-//connect to db and set cards
+// var cards = [];
+// connect to db and set cards
 mongoClient.connect(mongoUri, function (err, client) {
-  if(err){
+  if (err) {
     console.log('Error establishing database connection: ', err);
-  } else{
+  } else {
     var db = client.db('');
-    db.collection('cards').find({}).toArray(function(err, result){
-      if(err){
+    db.collection('cards').find({}).toArray(function (err, result) {
+      if (err) {
         console.log('Error finding cards: ', err);
-      } else{
+      } else {
         cards = result;
+        setInterval(function () {
+          getCard();
+        }, 15000);
       }
     });
   }
@@ -26,36 +43,59 @@ mongoClient.connect(mongoUri, function (err, client) {
 io.on('connection', (socket) => {
   console.log('user connected');
 
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
+  socket.on('disconnect', function () {
+    delete users[socket.username];
+    console.log(socket.username + ' disconnected');
   });
 
-  socket.on('login', function(username, callback){
-    console.log(username + ' has connected.');
-    callback(true);
+  socket.on('login', function (username, callback) {
+    var success;
+    socket.username = username;
+    if (socket.username in users) {
+      success = false;
+      console.log(socket.username + ' is already connected.');
+    } else {
+      users[socket.username] = 0;
+      success = true;
+      console.log(socket.username + ' has connected.');
+    }
+    callback(success);
+  });
+
+  socket.on('guess', function (guess, callback) {
+    var correct = false;
+    console.log(socket.username + ' has guessed ' + guess);
+    if (parseStrings(guess) === parseStrings(card.answer)) {
+      socket.username += 1;
+    }
+    socket.emit('my other event', { my: 'data' });
+    callback(correct);
   });
 });
 
+function parseStrings (str) {
+  if (str) {
+    str.replace('\\', '');
+    str.replace('\'', '');
+  }
+  return str;
+}
+function getCard () {
+  card = cards[Math.floor(Math.random() * (cards.length))];
+}
 
-// If an incoming request uses
-// a protocol other than HTTPS,
-// redirect that request to the
-// same url but with HTTPS
+// SSL for heroku deployment
+// const forceSSL = function () {
+//   return function (req, res, next) {
+//     if (req.headers['x-forwarded-proto'] !== 'https') {
+//       return res.redirect(['https://', req.get('Host'), req.url].join(''));
+//     }
+//     next();
+//   };
+// };
 
-const forceSSL = function () {
-  return function (req, res, next) {
-    if (req.headers['x-forwarded-proto'] !== 'https') {
-      return res.redirect(['https://', req.get('Host'), req.url].join(''));
-    }
-    next();
-  };
-};
-
-// Instruct the app
-// to use the forceSSL
-// middleware
-
-app.use(forceSSL());
+// SSL for heroku deployment
+// app.use(forceSSL());
 
 // Run the app by serving the static files
 // in the dist directory
@@ -66,8 +106,3 @@ app.use(express.static(path.join(__dirname, '/dist')));
 app.get('/*', function (req, res) {
   res.sendFile(path.join(path.join(__dirname, '/dist/index.html')));
 });
-
-// Start the app by listening on the default
-// Heroku port
-app.listen(process.env.PORT || 8080);
-console.log('Server at localhost:8080');

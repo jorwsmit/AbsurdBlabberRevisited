@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,17 +20,16 @@ export class LoginComponent implements OnInit {
 
   login() {
     this.loading = true;
-    this.authService.login(this.model.username);
-
-    // this.authService.login(this.model.username)
-    // .subscribe(result => {
-    //   if (result === true) {
-    //     this.router.navigate(['/game']);
-    //   } else {
-    //     this.error = 'Username or password is incorrect';
-    //     this.loading = false;
-    //   }
-    // });
+    this.authService.login(this.model.username)
+    .subscribe(result => {
+      console.log('From login '+ result);
+      if (result === true) {
+        this.router.navigate(['/game']);
+      } else {
+        this.error = 'Username didn\'t work. :(';
+        this.loading = false;
+      }
+    });
   }
 
 }

@@ -11,5 +11,5 @@ export class UserModule {
 
   username: string;
   score: number;
-  
+
 }

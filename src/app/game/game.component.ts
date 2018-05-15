@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { GameService } from '../services/game.service';
+import { Guess } from '../models/guess';
 
 @Component({
   selector: 'app-game',
@@ -7,9 +9,30 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GameComponent implements OnInit {
 
-  constructor() { }
+  @Input() guess: Guess;
+  model: any = {};
+  loading = false;
+  error = '';
+
+  constructor( private gameService: GameService ) { }
 
   ngOnInit() {
+    this.guess = new Guess();
+  }
+
+  guessCard() {
+    this.loading = true;
+    console.log(this.guess.inputGuess);
+    this.gameService.guess('static guess')
+    .subscribe(result => {
+      if (result === true) {
+        // this.router.navigate(['/game']);
+        this.loading = false;
+      } else {
+        this.error = 'Your guess was incorrect. :(';
+        this.loading = false;
+      }
+    });
   }
 
 }

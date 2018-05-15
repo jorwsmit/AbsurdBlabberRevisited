@@ -1,3 +1,15 @@
-<p>
-  game works!
-</p>
+<div class="col-md-6 col-md-offset-3">
+
+  <h2>Guess the card</h2>
+  <form name="form" (ngSubmit)="f.form.valid && guessCard()" #f="ngForm" novalidate>
+    <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !inputGuess.valid }">
+      <label for="inputGuess">Guess</label>
+      <input type="text" class="form-control" name="inputGuess" [(ngModel)]="guess.inputGuess" #inputGuess="ngModel" required />
+      <div *ngIf="f.submitted && !inputGuess.valid" class="help-block">Please input a guess</div>
+    </div>
+    <div class="form-group">
+      <button [disabled]="loading" class="btn btn-primary">Login</button>
+    </div>
+    <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+  </form>
+</div>
