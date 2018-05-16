@@ -42,8 +42,10 @@ mongoClient.connect(mongoUri, function (err, client) {
 
 io.on('connection', (socket) => {
   socket.on('disconnect', function () {
-    delete users[socket.username];
-    console.log(socket.username + ' disconnected');
+    if (socket.username) {
+      delete users[socket.username];
+      console.log(socket.username + ' disconnected');
+    }
   });
 
   socket.on('login', function (username, callback) {

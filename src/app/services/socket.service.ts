@@ -22,12 +22,13 @@ export class SocketService {
   public login(username: String): Observable<Boolean> {
     return new Observable(observer => {
       this.socket.emit('login', username, function(result){
-        if(result){
-          this.user = {
-            username: username,
-            score: 0
-          };
-        }
+        // if(result){
+        //   this.user = {
+        //     username: username,
+        //     score: 0
+        //   };
+        // }
+        // console.log(this.user);
         observer.next(result);
       });
     });

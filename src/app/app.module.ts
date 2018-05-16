@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { GameComponent } from './game/game.component';
 import { SocketService } from './services/socket.service';
+import { AuthGuard }  from './auth-guard.service';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { SocketService } from './services/socket.service';
     HttpModule
   ],
   providers: [
-    SocketService
+    SocketService,
+    AuthGuard
   ],
   bootstrap: [AppComponent]
 })
