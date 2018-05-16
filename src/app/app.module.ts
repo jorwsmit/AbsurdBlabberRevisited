@@ -9,8 +9,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { GameComponent } from './game/game.component';
-import { AuthService } from './services/auth.service';
-import { GameService } from './services/game.service';
+import { SocketService } from './services/socket.service';
 
 @NgModule({
   declarations: [
@@ -26,8 +25,7 @@ import { GameService } from './services/game.service';
     HttpModule
   ],
   providers: [
-    AuthService,
-    GameService
+    SocketService
   ],
   bootstrap: [AppComponent]
 })

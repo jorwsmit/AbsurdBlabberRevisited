@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { SocketService } from '../services/socket.service';
+import { User } from '../models/user';
 
 @Component({
   selector: 'app-login',
@@ -12,21 +13,23 @@ export class LoginComponent implements OnInit {
   model: any = {};
   loading = false;
   error = '';
+  ioConnection: any;
+  user: User;
 
-  constructor( private router: Router, private authService: AuthService ) { }
+  constructor( private router: Router, private socketService: SocketService ) { }
 
   ngOnInit() {
+    this.socketService.initSocket();
   }
 
   login() {
     this.loading = true;
-    this.authService.login(this.model.username)
+    this.socketService.login(this.model.username)
     .subscribe(result => {
-      console.log('From login '+ result);
       if (result === true) {
         this.router.navigate(['/game']);
       } else {
-        this.error = 'Username didn\'t work. :(';
+        this.error = 'Username didn\'t work. :( \n You should try another one!';
         this.loading = false;
       }
     });

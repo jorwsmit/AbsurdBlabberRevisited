@@ -1,5 +1,5 @@
 import {User} from './user';
-export class Guess {
-    user: User;
-    guess: String;
+export interface Guess {
+    user?: User;
+    guess?: String;
 }

@@ -1,4 +1,4 @@
 export interface User {
-    username: String
-    score: Number;
+    username?: String
+    score?: Number;
 }

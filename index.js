@@ -41,8 +41,6 @@ mongoClient.connect(mongoUri, function (err, client) {
 });
 
 io.on('connection', (socket) => {
-  console.log('user connected');
-
   socket.on('disconnect', function () {
     delete users[socket.username];
     console.log(socket.username + ' disconnected');
@@ -53,7 +51,6 @@ io.on('connection', (socket) => {
     socket.username = username;
     if (socket.username in users) {
       success = false;
-      console.log(socket.username + ' is already connected.');
     } else {
       users[socket.username] = 0;
       success = true;
