@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 
-import { Guess } from '../models/Guess';
+import { Guess } from '../models/guess';
 import { User } from '../models/user';
 import { Card } from '../models/card';
 import { GuessResult } from '../models/guessResult';
