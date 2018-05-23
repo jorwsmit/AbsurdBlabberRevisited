@@ -1,15 +1,29 @@
 <div class="col-md-6 col-md-offset-3">
-
-  <h2>Guess the card</h2>
+  <div ng-app="flip" ng-controller="flipCtrl">
+    <div class="flip">
+      <div class="card" [ngClass]="{ 'flipped': showAnswer }">
+        <div class="face front">
+          {{card.question}}
+        </div>
+        <div class="face back">
+          {{card.answer}}
+        </div>
+      </div>
+    </div>
+  </div>
   <form name="form" (ngSubmit)="f.form.valid && guessCard()" #f="ngForm" novalidate>
     <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !inputGuess.valid }">
-      <label for="inputGuess">Guess</label>
       <input type="text" class="form-control" name="inputGuess" [(ngModel)]="model.inputGuess" #inputGuess="ngModel" required />
-      <div *ngIf="f.submitted && !inputGuess.valid" class="help-block">Please input a guess</div>
     </div>
     <div class="form-group">
-      <button [disabled]="loading" class="btn btn-primary">Login</button>
+      <button [disabled]="loading" class="btn btn-primary">Guess</button>
     </div>
     <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+    <div *ngIf="success" class="alert alert-success">{{success}}</div>
   </form>
 </div>
+<ul class="userList">
+  <li *ngFor="let user of users">
+    <b>{{ user.username }}</b> {{ user.score }}
+  </li>
+</ul>

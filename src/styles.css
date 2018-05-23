@@ -1,1 +1,98 @@
 /* You can add global styles to this file, and also import other style files */
+body{
+  font-family: 'Roboto', sans-serif !important;
+  background: linear-gradient(270deg, #ff7878, #ffbf74);
+  background-size: 400% 400%;
+
+  -webkit-animation: animateGradient 20s ease infinite;
+  -moz-animation: animateGradient 20s ease infinite;
+  animation: animateGradient 20s ease infinite;
+}
+
+@-webkit-keyframes animateGradient {
+  0%{background-position:0% 97%}
+  50%{background-position:100% 4%}
+  100%{background-position:0% 97%}
+}
+@-moz-keyframes animateGradient {
+  0%{background-position:0% 97%}
+  50%{background-position:100% 4%}
+  100%{background-position:0% 97%}
+}
+@keyframes animateGradient {
+  0%{background-position:0% 97%}
+  50%{background-position:100% 4%}
+  100%{background-position:0% 97%}
+}
+
+.form-control{
+  text-align: center;
+  border-radius: 25px !important;
+  font-size: 25px !important;
+  height: 50px !important;
+}
+
+.form-control:focus {
+  border-color: inherit !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.btn:focus {
+  outline:0 !important;
+  box-shadow: 0 8px 15px 0px rgba(0,0,0,0.2);
+  transform: translatey(-3px);
+}
+
+.btn{
+  font-size: 18px !important;
+  width: 150px;
+  height: 50px;
+  background: #0f8fff !important;
+  border: none !important;
+  border-radius: 25px !important;
+  -moz-box-shadow: 0 5px 15px 0px rgba(0,0,0,0.4);
+  -webkit-box-shadow: 0 5px 15px 0px rgba(0,0,0,0.4);
+  box-shadow: 0 5px 15px 0px rgba(0,0,0,0.4);
+  transition: all 0.3s ease 0s;
+}
+.btn:hover{
+  border: none !important;
+  background: #15d683 !important;
+  animation: float 0.5s ease-in-out;
+  box-shadow: 0 8px 15px 0px rgba(0,0,0,0.2);
+  transform: translatey(-3px);
+}
+@keyframes float {
+  0% {
+    box-shadow: 0 5px 15px 0px rgba(0,0,0,0.4);
+    transform: translatey(0px);
+  }
+  50% {
+    box-shadow: 0 8px 15px 0px rgba(0,0,0,0.2);
+    transform: translatey(-3px);
+  }
+}
+
+.alert{
+  -moz-box-shadow: 0 5px 15px 0px rgba(0,0,0,0.4);
+  -webkit-box-shadow: 0 5px 15px 0px rgba(0,0,0,0.4);
+  box-shadow: 0 5px 15px 0px rgba(0,0,0,0.4);
+  color: white !important;
+  border-radius: 25px !important;
+  border: none !important;
+}
+
+.alert-danger{
+  background-color: #ed5c55 !important;
+}
+
+.alert-success{
+  background-color: #15d683 !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .btn{
+    width: 100%;
+  }
+}

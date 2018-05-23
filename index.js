@@ -2,25 +2,42 @@ const path = require('path');
 const express = require('express');
 const app = express();
 
-var users = {};
+var users = [];
+var disabledGuessers = [];
 
-var card = '';
+var card = {};
 var cards = [];
 
-// Start the app by listening on the default
-// Heroku port
-const server = app.listen(process.env.PORT || 8080);
-console.log('Server at localhost:8080');
+// will prevent users from guessing while cards answer is revealed
+var acceptGuess = false;
+
+// time to guess in ms
+var guessTime = 20000;
+
+// time that answer is revealed in ms
+var revealTime = 5000;
+
+// vars storing and controlling the countdown timer
+var time = guessTime / 1000;
+var countdown;
+
+// Start the app by listening on the default Heroku port or set environment variable port
+var port = 8080;
+if (process.env.PORT) port = process.env.PORT;
+app.set('port', port);
+console.log('Server at localhost:' + port);
 
 // used for heroku deployment
-// const io = require('socket.io')(require('https').Server(app));
+// const server = require('https').Server(app);
 
 // used for local deployment
+const server = app.listen(app.get('port'));
+
 const io = require('socket.io').listen(server);
 
 const mongoClient = require('mongodb').MongoClient;
 const mongoUri = process.env.MONGODB_URI;
-// var cards = [];
+
 // connect to db and set cards
 mongoClient.connect(mongoUri, function (err, client) {
   if (err) {
@@ -31,10 +48,9 @@ mongoClient.connect(mongoUri, function (err, client) {
       if (err) {
         console.log('Error finding cards: ', err);
       } else {
+        console.log('Connected to MongoDB and saved cards.');
         cards = result;
-        setInterval(function () {
-          getCard();
-        }, 15000);
+        getCard();
       }
     });
   }
@@ -43,44 +59,118 @@ mongoClient.connect(mongoUri, function (err, client) {
 io.on('connection', (socket) => {
   socket.on('disconnect', function () {
     if (socket.username) {
-      delete users[socket.username];
-      console.log(socket.username + ' disconnected');
+      removeUser(socket.username);
+      console.log(socket.username + ' has disconnected.');
     }
   });
 
   socket.on('login', function (username, callback) {
     var success;
     socket.username = username;
-    if (socket.username in users) {
+    if (usernameTaken(socket.username)) {
       success = false;
     } else {
-      users[socket.username] = 0;
+      users.push({username: socket.username, score: 0});
       success = true;
       console.log(socket.username + ' has connected.');
+      io.sockets.emit('onUsers', sortedUsers());
     }
     callback(success);
   });
 
+  socket.on('getCurrentCard', function (callback) {
+    if (!card) getCard();
+    var callbackCard = card;
+    if (acceptGuess) callbackCard.answer = '';
+    callback(callbackCard);
+  });
+
+  socket.on('getCurrentUsers', function (callback) {
+    callback(sortedUsers());
+  });
+
   socket.on('guess', function (guess, callback) {
-    var correct = false;
-    console.log(socket.username + ' has guessed ' + guess);
-    if (parseStrings(guess) === parseStrings(card.answer)) {
-      socket.username += 1;
+    var result = {'correct': false, 'alert': 'Your guess was incorrect. :('};
+    if (acceptGuess && disabledGuessers.indexOf(socket.username) === -1) {
+      console.log(socket.username + ' has guessed ' + guess + '.');
+      if (parseStrings(guess) === parseStrings(card.answer)) {
+        result = {'correct': true, 'alert': 'Your guess was correct! You have recieved ' + addScore(socket.username) + ' points.'};
+      }
+    } else if (!acceptGuess) {
+      result = {'correct': false, 'alert': 'You cannot guess the card while it is flipped.'};
+    } else {
+      result = {'correct': true, 'alert': 'You have already correctly guessed the card. Please wait for the next card to guess again.'};
     }
-    socket.emit('my other event', { my: 'data' });
-    callback(correct);
+    callback(result);
   });
 });
 
 function parseStrings (str) {
-  if (str) {
-    str.replace('\\', '');
-    str.replace('\'', '');
-  }
+  if (str) str = str.replace(/\.|'|\s|\?/g, '').toLowerCase();
   return str;
 }
+
 function getCard () {
+  clearTimeout(countdown);
+  time = guessTime / 1000;
+  disabledGuessers = [];
+  acceptGuess = true;
   card = cards[Math.floor(Math.random() * (cards.length))];
+  io.sockets.emit('onCard', {answer: '', question: card.question});
+  startTimer();
+  setTimeout(function () {
+    flipCard();
+  }, guessTime);
+}
+
+function flipCard () {
+  clearTimeout(countdown);
+  time = revealTime / 1000;
+  acceptGuess = false;
+  io.sockets.emit('onCard', {answer: card.answer, question: card.question});
+  startTimer();
+  setTimeout(function () {
+    time = guessTime / 1000;
+    getCard();
+  }, revealTime);
+}
+
+function startTimer () {
+  countdown = setInterval(function () {
+    io.sockets.emit('onTimer', time);
+    time--;
+  }, 1000);
+}
+
+function addScore (username) {
+  var points = Math.ceil((time / (guessTime / 1000)) * 3);
+  console.log('Adding ' + points + ' to ' + username);
+  for (var i = 0; i < users.length; i++) {
+    if (username === users[i].username) users[i].score += points;
+  }
+  disabledGuessers.push(username);
+  io.sockets.emit('onUsers', sortedUsers());
+  return points;
+}
+
+function sortedUsers () {
+  return users.sort(function (a, b) {
+    return b.score - a.score;
+  });
+}
+
+function removeUser (username) {
+  for (var i = 0; i < users.length; i++) {
+    if (username === users[i].username) users.splice(i, 1);
+  }
+  io.sockets.emit('onUsers', sortedUsers());
+}
+
+function usernameTaken (username) {
+  for (var i = 0; i < users.length; i++) {
+    if (username === users[i].username) return true;
+  }
+  return false;
 }
 
 // SSL for heroku deployment
