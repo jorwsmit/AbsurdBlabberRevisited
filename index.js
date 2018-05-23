@@ -21,27 +21,17 @@ var revealTime = 5000;
 var time = guessTime / 1000;
 var countdown;
 
-// var express = require('express'),
-//     http = require('http');
-// var app = express();
-// var server = http.createServer(app);
-// var io = require('socket.io').listen(server);
-// server.listen(3000);
-
-// Start the app by listening on the default Heroku port or set environment variable port
-var port = 8080;
-if (process.env.PORT) port = process.env.PORT;
-app.set('port', port);
-console.log('Server at localhost:' + port);
-
 // used for heroku deployment
 const server = require('https').createServer(app);
 const io = require('socket.io').listen(server);
-server.listen(app.get('port'));
+server.listen(process.env.PORT || 8080);
 
 // used for local deployment
-// const server = app.listen(app.get('port'));
+// const server = app.listen(process.env.PORT || 8080);
 // const io = require('socket.io').listen(server);
+
+// Start the app by listening on the default Heroku port or set environment variable port
+console.log('Server at localhost:' + process.env.PORT || 8080);
 
 const mongoClient = require('mongodb').MongoClient;
 const mongoUri = process.env.MONGODB_URI;

@@ -21,7 +21,7 @@ export class SocketService {
   guessResult: GuessResult;
 
   public initSocket(): void {
-    this.socket = io('http://localhost:8080');
+    this.socket = io('https://absurdblabber.herokuapp.com');
   }
 
   public login(username: String): Observable<Boolean> {
