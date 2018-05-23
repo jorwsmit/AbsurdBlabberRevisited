@@ -22,13 +22,13 @@ var time = guessTime / 1000;
 var countdown;
 
 // used for heroku deployment
-const server = require('https').createServer(app);
-const io = require('socket.io').listen(server);
-server.listen(process.env.PORT || 8080);
+// const server = require('https').createServer(app);
+// const io = require('socket.io').listen(server);
+// server.listen(process.env.PORT || 8080);
 
 // used for local deployment
-// const server = app.listen(process.env.PORT || 8080);
-// const io = require('socket.io').listen(server);
+const server = app.listen(process.env.PORT || 8080);
+const io = require('socket.io').listen(server);
 
 // Start the app by listening on the default Heroku port or set environment variable port
 console.log('Server at localhost:' + process.env.PORT || 8080);
