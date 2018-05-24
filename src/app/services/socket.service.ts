@@ -80,7 +80,6 @@ export class SocketService {
   public onCard(): Observable<Card> {
     return new Observable<Card>(observer => {
       this.socket.on('onCard', function(card){
-        console.log(card);
         observer.next(card);
       });
     });
