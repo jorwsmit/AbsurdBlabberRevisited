@@ -1,5 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+html{
+  overflow: hidden;
+}
 body{
+  overflow: hidden;
   font-family: 'Roboto', sans-serif !important;
   background: linear-gradient(270deg, #ff7878, #ffbf74);
   background-size: 400% 400%;

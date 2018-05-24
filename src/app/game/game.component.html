@@ -27,3 +27,11 @@
     <b>{{ user.username }}</b> {{ user.score }}
   </li>
 </ul>
+<div class="timer" [ngClass]="{ 'time-success': showAnswer, 'time-primary': !showAnswer }">
+  <div>
+    TIME
+  </div>
+  <div class="time">
+    {{ time }}
+  </div>
+</div>

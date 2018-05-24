@@ -21,7 +21,7 @@ export class SocketService {
   guessResult: GuessResult;
 
   public initSocket(): void {
-    this.socket = io('https://absurdblabber.herokuapp.com');
+    this.socket = io('https://absurdblabber.herokuapp.com/');
   }
 
   public login(username: String): Observable<Boolean> {
@@ -65,6 +65,12 @@ export class SocketService {
     });
   }
 
+  public onTimer(): Observable<Number> {
+    return new Observable<Number>(observer => {
+      this.socket.on('onTimer', (data: Number) => observer.next(data));
+    });
+  }
+
   public onUsers(): Observable<Array<User>> {
     return new Observable<Array<User>>(observer => {
       this.socket.on('onUsers', (data: Array<User>) => observer.next(data));
@@ -74,6 +80,7 @@ export class SocketService {
   public onCard(): Observable<Card> {
     return new Observable<Card>(observer => {
       this.socket.on('onCard', function(card){
+        console.log(card);
         observer.next(card);
       });
     });

@@ -20,63 +20,69 @@ export class GameComponent implements OnInit {
   users: Array<User>;
   card: Card;
   guessResult: GuessResult;
+  time: Number;
   // onCard: any;
 
   constructor( private socketService: SocketService) { }
 
   ngOnInit() {
-    // this.guess = new Guess();
+
     this.card = {
-    question: null,
-    answer: null
-  };
+      question: null,
+      answer: null
+    };
 
-  this.socketService.onCard()
-  .subscribe((card: Card) => {
-    if(card.answer) this.showAnswer = true;
-    else this.showAnswer = false;
-    this.card = card;
-  });
+    this.socketService.getCurrentCard()
+    .subscribe((card: Card) => {
+      if(card.answer) this.showAnswer = true;
+      else this.showAnswer = false;
+      this.card = card;
+      this.loading = false;
+    });
 
-  this.socketService.onUsers()
-  .subscribe((users: Array<User>) => {
-    this.users = users;
-  });
+    this.socketService.getCurrentUsers()
+    .subscribe((users: Array<User>) => {
+      this.users = users;
+    });
+    
+    this.socketService.onCard()
+    .subscribe((card: Card) => {
+      if(card.answer) this.showAnswer = true;
+      else this.showAnswer = false;
+      this.card = card;
+    });
 
-  this.socketService.getCurrentCard()
-  .subscribe((card: Card) => {
-    if(card.answer) this.showAnswer = true;
-    else this.showAnswer = false;
-    this.card = card;
-    this.loading = false;
-  });
+    this.socketService.onTimer()
+    .subscribe((time: Number) => {
+      this.time = time;
+    });
 
-  this.socketService.getCurrentUsers()
-  .subscribe((users: Array<User>) => {
-    this.users = users;
-  });
-}
+    this.socketService.onUsers()
+    .subscribe((users: Array<User>) => {
+      this.users = users;
+    });
+  }
 
-guessCard() {
-  this.loading = true;
-  this.socketService.emitGuess(this.model.inputGuess)
-  .subscribe(result => {
-    this.guessResult = result;
-    this.error = '';
-    if (this.guessResult.correct === true) {
-      this.success = this.guessResult.alert;
-      setTimeout( () => {
+  guessCard() {
+    this.loading = true;
+    this.socketService.emitGuess(this.model.inputGuess)
+    .subscribe(result => {
+      this.guessResult = result;
+      this.error = '';
+      if (this.guessResult.correct === true) {
+        this.success = this.guessResult.alert;
+        setTimeout( () => {
+          this.success = '';
+        }, 3500);
+      } else {
+        this.error = this.guessResult.alert;
         this.success = '';
-      }, 3500);
-    } else {
-      this.error = this.guessResult.alert;
-      this.success = '';
-      setTimeout( () => {
-        this.error = '';
-      }, 3500);
-    }
-    this.loading = false;
-  });
-}
+        setTimeout( () => {
+          this.error = '';
+        }, 3500);
+      }
+      this.loading = false;
+    });
+  }
 
 }

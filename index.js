@@ -12,14 +12,14 @@ var cards = [];
 var acceptGuess = false;
 
 // time to guess in ms
-var guessTime = 20000;
+var guessTime = 10000;
 
 // time that answer is revealed in ms
 var revealTime = 5000;
 
 // vars storing and controlling the countdown timer
 var time = guessTime / 1000;
-var countdown;
+// var countdown;
 
 // Start the app by listening on the default Heroku port or set environment variable port
 const server = app.listen(process.env.PORT || 8080);
@@ -42,6 +42,7 @@ mongoClient.connect(mongoUri, function (err, client) {
       } else {
         console.log('Connected to MongoDB and saved cards.');
         cards = result;
+        startTimer();
         getCard();
       }
     });
@@ -71,8 +72,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('getCurrentCard', function (callback) {
-    if (!card) getCard();
-    var callbackCard = card;
+    var callbackCard = {answer: card.answer, question: card.question};
     if (acceptGuess) callbackCard.answer = '';
     callback(callbackCard);
   });
@@ -103,35 +103,34 @@ function parseStrings (str) {
 }
 
 function getCard () {
-  clearTimeout(countdown);
   time = guessTime / 1000;
+  io.sockets.emit('onTimer', time);
   disabledGuessers = [];
   acceptGuess = true;
   card = cards[Math.floor(Math.random() * (cards.length))];
   io.sockets.emit('onCard', {answer: '', question: card.question});
-  startTimer();
   setTimeout(function () {
     flipCard();
   }, guessTime);
 }
 
 function flipCard () {
-  clearTimeout(countdown);
   time = revealTime / 1000;
+  io.sockets.emit('onTimer', time);
   acceptGuess = false;
   io.sockets.emit('onCard', {answer: card.answer, question: card.question});
-  startTimer();
   setTimeout(function () {
-    time = guessTime / 1000;
     getCard();
   }, revealTime);
 }
 
 function startTimer () {
-  countdown = setInterval(function () {
-    io.sockets.emit('onTimer', time);
+  setInterval(function () {
     time--;
   }, 1000);
+  setInterval(function () {
+    io.sockets.emit('onTimer', time);
+  }, 250);
 }
 
 function addScore (username) {
