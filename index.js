@@ -12,7 +12,7 @@ var cards = [];
 var acceptGuess = false;
 
 // time to guess in ms
-var guessTime = 10000;
+var guessTime = 20000;
 
 // time that answer is revealed in ms
 var revealTime = 5000;
